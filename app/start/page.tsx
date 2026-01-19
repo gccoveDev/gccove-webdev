@@ -27,9 +27,9 @@ export default function StartProject() {
         const res = await fetch("/api/paypal", { method: "POST" });
         const data = await res.json();
         // Save both to state
-        setPaypalState({ 
-          clientToken: data.client_token, 
-          clientId: data.client_id 
+        setPaypalState({
+          clientToken: data.client_token,
+          clientId: data.client_id
         });
       } catch (err) {
         console.error("Failed to load PayPal", err);
@@ -52,8 +52,8 @@ export default function StartProject() {
               key={item.id}
               onClick={() => setSelectedProduct(item)}
               className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedProduct.id === item.id
-                  ? "border-purple-500 bg-neutral-900"
-                  : "border-gray-800 hover:border-gray-600"
+                ? "border-purple-500 bg-neutral-900"
+                : "border-gray-800 hover:border-gray-600"
                 }`}
             >
               <div className="flex justify-between items-center">
@@ -67,23 +67,12 @@ export default function StartProject() {
         {/* Right Side: The Custom Form */}
         <div className="bg-neutral-900 p-8 rounded-xl border border-gray-800 min-h-[400px]">
           <h3 className="text-xl font-bold mb-6">2. Payment Details</h3>
-<<<<<<< Updated upstream
-          
           {/* ONLY RENDER IF WE HAVE BOTH TOKEN AND ID */}
           {paypalState.clientToken && paypalState.clientId ? (
-            <PayPalScriptProvider 
-              options={{ 
-                clientId: paypalState.clientId, // <--- USES THE SERVER ID
-                dataClientToken: paypalState.clientToken, 
-=======
-
-          {/* ONLY RENDER PAYPAL IF WE HAVE THE TOKEN */}
-          {clientToken ? (
             <PayPalScriptProvider
               options={{
-                clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5",
-                dataClientToken: clientToken, // <--- NOW WE HAVE A REAL TOKEN
->>>>>>> Stashed changes
+                clientId: paypalState.clientId, // <--- USES THE SERVER ID
+                dataClientToken: paypalState.clientToken,
                 components: "hosted-fields,buttons",
                 currency: "USD",
                 intent: "CAPTURE"
@@ -118,10 +107,7 @@ export default function StartProject() {
               </PayPalHostedFieldsProvider>
             </PayPalScriptProvider>
           ) : (
-<<<<<<< Updated upstream
-=======
             // LOADING STATE (Prevents the build error!)
->>>>>>> Stashed changes
             <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
               Loading Secure Checkout...
             </div>

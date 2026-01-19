@@ -7,6 +7,7 @@ import {
   usePayPalHostedFields 
 } from "@paypal/react-paypal-js";
 import { useState } from "react";
+import Link from "next/link"; // Added this for the back button
 
 const products = [
   { id: 1, name: "1-hour infrastructure call", price: "300.00" },
@@ -21,8 +22,7 @@ export default function StartProject() {
   return (
     <PayPalScriptProvider 
       options={{ 
-        clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5", // Remember to change this to your Live Client ID later!
-        dataClientToken: "test_token", 
+        clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5", 
         components: "hosted-fields,buttons",
         currency: "USD",
         intent: "CAPTURE"
@@ -79,6 +79,14 @@ export default function StartProject() {
             </PayPalHostedFieldsProvider>
           </div>
         </div>
+
+        {/* --- ADDED THIS BACK: The Back Button --- */}
+        <div className="mt-12 text-center">
+          <Link href="/" className="text-gray-500 hover:text-white underline transition-colors">
+            &larr; Back to Home
+          </Link>
+        </div>
+
       </main>
     </PayPalScriptProvider>
   );
@@ -89,8 +97,7 @@ function CreditCardForm({ product }: { product: any }) {
   const [paying, setPaying] = useState(false);
 
   const submitHandler = () => {
-    // FIX IS HERE: We check if cardFields exists first
-    if (!cardFields) return;
+    if (!cardFields) return; // Keeps the build safe!
 
     setPaying(true);
     

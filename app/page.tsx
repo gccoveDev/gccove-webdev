@@ -5,11 +5,9 @@ export default function Home() {
     <main className="min-h-screen bg-black text-white font-sans selection:bg-purple-500 selection:text-white">
       {/* Navigation */}
       <nav className="fixed w-full flex justify-between items-center p-6 md:p-12 z-50 mix-blend-difference">
-        <div className="text-xl font-bold tracking-widest">DEVS • BAND</div>
+        <div className="text-xl font-bold tracking-widest">COVE • CREW</div>
         <div className="hidden md:flex gap-8 text-sm font-medium">
           <a href="#services" className="hover:text-gray-400 transition-colors">SERVICES</a>
-          <a href="#about" className="hover:text-gray-400 transition-colors">ABOUT</a>
-          <a href="#contact" className="hover:text-gray-400 transition-colors">CONTACT</a>
         </div>
       </nav>
 
@@ -23,11 +21,11 @@ export default function Home() {
         </h1>
         <p className="text-lg md:text-xl text-gray-400 max-w-2xl mb-10">
           Professional development of high-quality websites, applications, branding & logos.
-          Since 2015.
+          Since 2020.
         </p>
-        <button className="px-8 py-3 border border-white hover:bg-white hover:text-black transition-all duration-300 font-bold tracking-wide">
-          START A PROJECT
-        </button>
+        <Link href="/start" className="px-8 py-3 border border-white hover:bg-white hover:text-black transition-all duration-300 font-bold tracking-wide inline-block">
+          START/CONTINUE A PROJECT
+        </Link>
       </section>
 
       {/* Services Grid */}
@@ -58,7 +56,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-12 text-center text-gray-600 text-sm">
-        <p>&copy; {new Date().getFullYear()} DEVS • BAND. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} COVE • CREW. All rights reserved.</p>
       </footer>
     </main>
   );

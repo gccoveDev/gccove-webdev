@@ -31,11 +31,12 @@ export default function StartProject() {
                   style={{ layout: "horizontal", color: "white", label: "pay" }}
                   createOrder={(data, actions) => {
                     return actions.order.create({
+                      intent: "CAPTURE", // <--- ADDED THIS LINE TO FIX THE ERROR
                       purchase_units: [
                         {
                           description: item.name,
                           amount: {
-                            currency_code: "USD", // <--- THIS WAS THE MISSING LINE
+                            currency_code: "USD",
                             value: item.price,
                           },
                         },

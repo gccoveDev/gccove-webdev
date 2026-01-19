@@ -1,8 +1,7 @@
-"use client"; // This is required for PayPal buttons to work
+"use client";
 
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-// Your products from the screenshot
 const products = [
   { id: 1, name: "1-hour infrastructure call", price: "300.00" },
   { id: 2, name: "30-minute existing site edit", price: "39.00" },
@@ -12,7 +11,7 @@ const products = [
 
 export default function StartProject() {
   return (
-    <PayPalScriptProvider options={{ clientId: "test" }}> {/* Replace 'test' with your real Client ID later */}
+    <PayPalScriptProvider options={{ clientId: "test" }}>
       <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
         
         <h1 className="text-4xl md:text-6xl font-black mb-12 text-center">
@@ -27,7 +26,6 @@ export default function StartProject() {
                 <p className="text-3xl font-mono text-gray-400 mb-8">${item.price}</p>
               </div>
               
-              {/* PayPal Button Container */}
               <div className="w-full relative z-0">
                 <PayPalButtons
                   style={{ layout: "horizontal", color: "white", label: "pay" }}
@@ -37,6 +35,7 @@ export default function StartProject() {
                         {
                           description: item.name,
                           amount: {
+                            currency_code: "USD", // <--- THIS WAS THE MISSING LINE
                             value: item.price,
                           },
                         },

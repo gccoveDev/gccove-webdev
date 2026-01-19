@@ -4,18 +4,16 @@ const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
 export async function POST() {
   try {
-    // 1. Get an Access Token from PayPal
+    // 1. Get Access Token
     const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
     const response = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token", {
       method: "POST",
       body: "grant_type=client_credentials",
-      headers: {
-        Authorization: `Basic ${auth}`,
-      },
+      headers: { Authorization: `Basic ${auth}` },
     });
     const data = await response.json();
 
-    // 2. Use that Access Token to generate a Client Token
+    // 2. Get Client Token
     const response2 = await fetch("https://api-m.sandbox.paypal.com/v1/identity/generate-token", {
       method: "POST",
       headers: {
@@ -25,8 +23,11 @@ export async function POST() {
     });
     const data2 = await response2.json();
     
-    // 3. Send the token back to your frontend
-    return NextResponse.json({ client_token: data2.client_token });
+    // 3. RETURN BOTH THE TOKEN AND THE ID
+    return NextResponse.json({ 
+      client_token: data2.client_token, 
+      client_id: PAYPAL_CLIENT_ID // <--- Sending this ensures they match!
+    });
   } catch (error) {
     console.error("PayPal API Error:", error);
     return NextResponse.json({ error: "Failed to generate token" }, { status: 500 });

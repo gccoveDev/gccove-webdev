@@ -1,10 +1,10 @@
 "use client";
 
-import { 
-  PayPalScriptProvider, 
-  PayPalHostedFieldsProvider, 
-  PayPalHostedField, 
-  usePayPalHostedFields 
+import {
+  PayPalScriptProvider,
+  PayPalHostedFieldsProvider,
+  PayPalHostedField,
+  usePayPalHostedFields
 } from "@paypal/react-paypal-js";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -48,14 +48,13 @@ export default function StartProject() {
         <div className="space-y-4">
           <h3 className="text-xl font-bold mb-4">1. Select Service</h3>
           {products.map((item) => (
-            <div 
+            <div
               key={item.id}
               onClick={() => setSelectedProduct(item)}
-              className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                selectedProduct.id === item.id 
-                  ? "border-purple-500 bg-neutral-900" 
+              className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedProduct.id === item.id
+                  ? "border-purple-500 bg-neutral-900"
                   : "border-gray-800 hover:border-gray-600"
-              }`}
+                }`}
             >
               <div className="flex justify-between items-center">
                 <span className="font-bold">{item.name}</span>
@@ -68,6 +67,7 @@ export default function StartProject() {
         {/* Right Side: The Custom Form */}
         <div className="bg-neutral-900 p-8 rounded-xl border border-gray-800 min-h-[400px]">
           <h3 className="text-xl font-bold mb-6">2. Payment Details</h3>
+<<<<<<< Updated upstream
           
           {/* ONLY RENDER IF WE HAVE BOTH TOKEN AND ID */}
           {paypalState.clientToken && paypalState.clientId ? (
@@ -75,6 +75,15 @@ export default function StartProject() {
               options={{ 
                 clientId: paypalState.clientId, // <--- USES THE SERVER ID
                 dataClientToken: paypalState.clientToken, 
+=======
+
+          {/* ONLY RENDER PAYPAL IF WE HAVE THE TOKEN */}
+          {clientToken ? (
+            <PayPalScriptProvider
+              options={{
+                clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5",
+                dataClientToken: clientToken, // <--- NOW WE HAVE A REAL TOKEN
+>>>>>>> Stashed changes
                 components: "hosted-fields,buttons",
                 currency: "USD",
                 intent: "CAPTURE"
@@ -93,11 +102,26 @@ export default function StartProject() {
                     }],
                   });
                 }) as any}
+                styles={{
+                  input: {
+                    "font-size": "16px",
+                    "font-family": "sans-serif",
+                    "color": "#ffffff",
+                    "padding": "0 16px", // Match px-4. Vertical centering is handled by line-height or flex in iframe usually, but padding-left/right is key.
+                  },
+                  "::placeholder": {
+                    "color": "#6b7280", // gray-500
+                  },
+                }}
               >
                 <CreditCardForm product={selectedProduct} />
               </PayPalHostedFieldsProvider>
             </PayPalScriptProvider>
           ) : (
+<<<<<<< Updated upstream
+=======
+            // LOADING STATE (Prevents the build error!)
+>>>>>>> Stashed changes
             <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
               Loading Secure Checkout...
             </div>
@@ -121,7 +145,7 @@ function CreditCardForm({ product }: { product: any }) {
   const submitHandler = () => {
     if (!cardFields) return;
     setPaying(true);
-    
+
     cardFields.submit()
       .then(() => {
         alert(`Payment successful for ${product.name}!`);
@@ -142,7 +166,7 @@ function CreditCardForm({ product }: { product: any }) {
           id="card-number"
           hostedFieldType="number"
           options={{ selector: "#card-number", placeholder: "0000 0000 0000 0000" }}
-          className="h-12 w-full bg-black border border-gray-700 rounded px-4 py-3 text-white focus:border-purple-500 transition-colors"
+          className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors flex items-center"
         />
       </div>
 
@@ -153,7 +177,7 @@ function CreditCardForm({ product }: { product: any }) {
             id="expiration-date"
             hostedFieldType="expirationDate"
             options={{ selector: "#expiration-date", placeholder: "MM/YY" }}
-            className="h-12 w-full bg-black border border-gray-700 rounded px-4 py-3 text-white focus:border-purple-500 transition-colors"
+            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors flex items-center"
           />
         </div>
 
@@ -163,12 +187,12 @@ function CreditCardForm({ product }: { product: any }) {
             id="cvv"
             hostedFieldType="cvv"
             options={{ selector: "#cvv", placeholder: "123" }}
-            className="h-12 w-full bg-black border border-gray-700 rounded px-4 py-3 text-white focus:border-purple-500 transition-colors"
+            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors flex items-center"
           />
         </div>
       </div>
 
-      <button 
+      <button
         onClick={submitHandler}
         disabled={paying}
         className="w-full bg-white text-black font-bold py-4 rounded hover:bg-gray-200 transition-colors disabled:opacity-50"

@@ -11,7 +11,7 @@ const products = [
 
 export default function StartProject() {
   return (
-    <PayPalScriptProvider options={{ clientId: "test" }}>
+    <PayPalScriptProvider options={{ clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5" }}>
       <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
         
         <h1 className="text-4xl md:text-6xl font-black mb-12 text-center">

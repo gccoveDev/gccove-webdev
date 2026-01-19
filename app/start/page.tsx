@@ -4,7 +4,8 @@ import {
   PayPalScriptProvider,
   PayPalHostedFieldsProvider,
   PayPalHostedField,
-  usePayPalHostedFields
+  usePayPalHostedFields,
+  PayPalButtons
 } from "@paypal/react-paypal-js";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -73,13 +74,34 @@ export default function StartProject() {
           {paypalState.clientToken && paypalState.clientId ? (
             <PayPalScriptProvider
               options={{
-                clientId: paypalState.clientId, // <--- USES THE SERVER ID
+                clientId: paypalState.clientId,
                 dataClientToken: paypalState.clientToken,
-                components: "hosted-fields,buttons",
-                currency: "USD",
-                intent: "CAPTURE"
+                // components: "hosted-fields,buttons", // <--- COMMENTED OUT TO DEBUG
+                // currency: "USD",
+                // intent: "CAPTURE"
               }}
             >
+              {/* DEBUGGING: Try standard buttons first to verify Client ID */}
+              <div className="text-center mb-4 text-yellow-500">
+                Debug Mode: Testing Standard Buttons
+              </div>
+              <PayPalButtons
+                style={{ layout: "vertical" }}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    intent: "CAPTURE",
+                    purchase_units: [{
+                      description: selectedProduct.name,
+                      amount: {
+                        currency_code: "USD",
+                        value: selectedProduct.price,
+                      },
+                    }],
+                  });
+                }}
+              />
+
+              {/* 
               <PayPalHostedFieldsProvider
                 createOrder={((data: any, actions: any) => {
                   return actions.order.create({
@@ -98,15 +120,16 @@ export default function StartProject() {
                     "font-size": "16px",
                     "font-family": "sans-serif",
                     "color": "#ffffff",
-                    "padding": "0 16px", // Match px-4. Vertical centering is handled by line-height or flex in iframe usually, but padding-left/right is key.
+                    "padding": "0 16px", 
                   },
                   "::placeholder": {
-                    "color": "#6b7280", // gray-500
+                    "color": "#6b7280", 
                   },
                 }}
               >
                 <CreditCardForm product={selectedProduct} />
               </PayPalHostedFieldsProvider>
+              */}
             </PayPalScriptProvider>
           ) : (
             // LOADING STATE (Prevents the build error!)

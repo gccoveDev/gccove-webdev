@@ -26,6 +26,7 @@ export default function StartProject() {
       try {
         const res = await fetch("/api/paypal", { method: "POST" });
         const data = await res.json();
+        console.log("PayPal Data Loaded:", data);
         // Save both to state
         setPaypalState({
           clientToken: data.client_token,
@@ -36,6 +37,7 @@ export default function StartProject() {
       }
     })();
   }, []);
+
 
   return (
     <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
@@ -152,7 +154,7 @@ function CreditCardForm({ product }: { product: any }) {
           id="card-number"
           hostedFieldType="number"
           options={{ selector: "#card-number", placeholder: "0000 0000 0000 0000" }}
-          className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors flex items-center"
+          className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors"
         />
       </div>
 
@@ -163,7 +165,7 @@ function CreditCardForm({ product }: { product: any }) {
             id="expiration-date"
             hostedFieldType="expirationDate"
             options={{ selector: "#expiration-date", placeholder: "MM/YY" }}
-            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors flex items-center"
+            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors"
           />
         </div>
 
@@ -173,7 +175,7 @@ function CreditCardForm({ product }: { product: any }) {
             id="cvv"
             hostedFieldType="cvv"
             options={{ selector: "#cvv", placeholder: "123" }}
-            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors flex items-center"
+            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors"
           />
         </div>
       </div>

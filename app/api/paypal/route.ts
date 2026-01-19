@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
+if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+  console.error("PayPal API Error: Missing Environment Variables");
+}
+
 export async function POST() {
   try {
     // 1. Get Access Token
@@ -22,10 +26,10 @@ export async function POST() {
       },
     });
     const data2 = await response2.json();
-    
+
     // 3. RETURN BOTH THE TOKEN AND THE ID
-    return NextResponse.json({ 
-      client_token: data2.client_token, 
+    return NextResponse.json({
+      client_token: data2.client_token,
       client_id: PAYPAL_CLIENT_ID // <--- Sending this ensures they match!
     });
   } catch (error) {

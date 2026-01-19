@@ -6,8 +6,8 @@ import {
   PayPalHostedField, 
   usePayPalHostedFields 
 } from "@paypal/react-paypal-js";
-import { useState } from "react";
-import Link from "next/link"; // Added this for the back button
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const products = [
   { id: 1, name: "1-hour infrastructure call", price: "300.00" },
@@ -18,77 +18,92 @@ const products = [
 
 export default function StartProject() {
   const [selectedProduct, setSelectedProduct] = useState(products[3]);
+  const [clientToken, setClientToken] = useState(null);
+
+  // FETCH THE TOKEN WHEN THE PAGE LOADS
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/paypal", { method: "POST" });
+      const data = await res.json();
+      setClientToken(data.client_token);
+    })();
+  }, []);
 
   return (
-    <PayPalScriptProvider 
-      options={{ 
-        clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5", 
-        components: "hosted-fields,buttons",
-        currency: "USD",
-        intent: "CAPTURE"
-      }}
-    >
-      <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
-        
-        <h1 className="text-4xl md:text-6xl font-black mb-12 text-center">
-          SECURE <span className="text-purple-500">CHECKOUT</span>
-        </h1>
+    <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
+      <h1 className="text-4xl md:text-6xl font-black mb-12 text-center">
+        SECURE <span className="text-purple-500">CHECKOUT</span>
+      </h1>
 
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
-          {/* Left Side: Product Selection */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold mb-4">1. Select Service</h3>
-            {products.map((item) => (
-              <div 
-                key={item.id}
-                onClick={() => setSelectedProduct(item)}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedProduct.id === item.id 
-                    ? "border-purple-500 bg-neutral-900" 
-                    : "border-gray-800 hover:border-gray-600"
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-bold">{item.name}</span>
-                  <span className="font-mono text-purple-400">${item.price}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Right Side: The Custom Form */}
-          <div className="bg-neutral-900 p-8 rounded-xl border border-gray-800">
-            <h3 className="text-xl font-bold mb-6">2. Payment Details</h3>
-            
-            <PayPalHostedFieldsProvider
-              createOrder={((data: any, actions: any) => {
-                return actions.order.create({
-                  intent: "CAPTURE",
-                  purchase_units: [{
-                    description: selectedProduct.name,
-                    amount: {
-                      currency_code: "USD",
-                      value: selectedProduct.price,
-                    },
-                  }],
-                });
-              }) as any}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Left Side: Product Selection */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold mb-4">1. Select Service</h3>
+          {products.map((item) => (
+            <div 
+              key={item.id}
+              onClick={() => setSelectedProduct(item)}
+              className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                selectedProduct.id === item.id 
+                  ? "border-purple-500 bg-neutral-900" 
+                  : "border-gray-800 hover:border-gray-600"
+              }`}
             >
-              <CreditCardForm product={selectedProduct} />
-            </PayPalHostedFieldsProvider>
-          </div>
+              <div className="flex justify-between items-center">
+                <span className="font-bold">{item.name}</span>
+                <span className="font-mono text-purple-400">${item.price}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* --- ADDED THIS BACK: The Back Button --- */}
-        <div className="mt-12 text-center">
-          <Link href="/" className="text-gray-500 hover:text-white underline transition-colors">
-            &larr; Back to Home
-          </Link>
+        {/* Right Side: The Custom Form */}
+        <div className="bg-neutral-900 p-8 rounded-xl border border-gray-800 min-h-[400px]">
+          <h3 className="text-xl font-bold mb-6">2. Payment Details</h3>
+          
+          {/* ONLY RENDER PAYPAL IF WE HAVE THE TOKEN */}
+          {clientToken ? (
+            <PayPalScriptProvider 
+              options={{ 
+                clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5", 
+                dataClientToken: clientToken, // <--- NOW WE HAVE A REAL TOKEN
+                components: "hosted-fields,buttons",
+                currency: "USD",
+                intent: "CAPTURE"
+              }}
+            >
+              <PayPalHostedFieldsProvider
+                createOrder={((data: any, actions: any) => {
+                  return actions.order.create({
+                    intent: "CAPTURE",
+                    purchase_units: [{
+                      description: selectedProduct.name,
+                      amount: {
+                        currency_code: "USD",
+                        value: selectedProduct.price,
+                      },
+                    }],
+                  });
+                }) as any}
+              >
+                <CreditCardForm product={selectedProduct} />
+              </PayPalHostedFieldsProvider>
+            </PayPalScriptProvider>
+          ) : (
+             // LOADING STATE (Prevents the build error!)
+            <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
+              Loading Secure Checkout...
+            </div>
+          )}
         </div>
+      </div>
 
-      </main>
-    </PayPalScriptProvider>
+      <div className="mt-12 text-center">
+        <Link href="/" className="text-gray-500 hover:text-white underline transition-colors">
+          &larr; Back to Home
+        </Link>
+      </div>
+    </main>
   );
 }
 
@@ -97,8 +112,7 @@ function CreditCardForm({ product }: { product: any }) {
   const [paying, setPaying] = useState(false);
 
   const submitHandler = () => {
-    if (!cardFields) return; // Keeps the build safe!
-
+    if (!cardFields) return;
     setPaying(true);
     
     cardFields.submit()
@@ -114,7 +128,7 @@ function CreditCardForm({ product }: { product: any }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <div>
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Card Number</label>
         <PayPalHostedField

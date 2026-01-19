@@ -9,8 +9,12 @@ if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
 export async function POST() {
   try {
     // 1. Get Access Token
+    // NOTE: Switched to LIVE URL (api.paypal.com) based on user request.
+    // If you need Sandbox, switch back to "https://api.sandbox.paypal.com"
+    const PAYPAL_API_URL = "https://api.paypal.com";
+
     const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
-    const response = await fetch("https://api.sandbox.paypal.com/v1/oauth2/token", {
+    const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
       method: "POST",
       body: "grant_type=client_credentials",
       headers: { Authorization: `Basic ${auth}` },
@@ -19,11 +23,12 @@ export async function POST() {
 
     if (!data.access_token) {
       console.error("PayPal Auth Failed:", data);
-      return NextResponse.json({ error: "Auth failed" }, { status: 500 });
+      // Return the actual error from PayPal so we can see it in the browser console
+      return NextResponse.json({ error: "Auth failed", details: data }, { status: 500 });
     }
 
     // 2. Get Client Token
-    const response2 = await fetch("https://api.sandbox.paypal.com/v1/identity/generate-token", {
+    const response2 = await fetch(`${PAYPAL_API_URL}/v1/identity/generate-token`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${data.access_token}`,

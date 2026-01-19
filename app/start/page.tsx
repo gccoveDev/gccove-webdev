@@ -16,14 +16,14 @@ const products = [
 ];
 
 export default function StartProject() {
-  const [selectedProduct, setSelectedProduct] = useState(products[3]); // Default to last item
+  const [selectedProduct, setSelectedProduct] = useState(products[3]);
 
   return (
     <PayPalScriptProvider 
       options={{ 
-        clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5", // REPLACE THIS! "test" won't work for Hosted Fields
-        dataClientToken: "YOUR_DATA_CLIENT_TOKEN", // Optional in Sandbox, often needed in Prod
-        components: "hosted-fields,buttons", // Crucial: tells PayPal to load the fields
+        clientId: "Ac-E3F1bdEvc1PvqMnTTFNd4FA7wTJuu90e-1lZEWC6vHp5zVLAefgiZnfbZomi0LHFaQy_1T90hwTI5", // Remember to change this to your Live Client ID later!
+        dataClientToken: "test_token", 
+        components: "hosted-fields,buttons",
         currency: "USD",
         intent: "CAPTURE"
       }}
@@ -62,8 +62,6 @@ export default function StartProject() {
             <h3 className="text-xl font-bold mb-6">2. Payment Details</h3>
             
             <PayPalHostedFieldsProvider
-              // We use "as any" here to stop TypeScript from complaining about the function signature
-              // It works perfectly at runtime, the strict type definition is just slightly off.
               createOrder={((data: any, actions: any) => {
                 return actions.order.create({
                   intent: "CAPTURE",
@@ -75,7 +73,7 @@ export default function StartProject() {
                     },
                   }],
                 });
-              }) as any} 
+              }) as any}
             >
               <CreditCardForm product={selectedProduct} />
             </PayPalHostedFieldsProvider>
@@ -86,25 +84,22 @@ export default function StartProject() {
   );
 }
 
-// Sub-component that holds the actual "Form" and "Pay Button"
-// This separates logic so we can use the `usePayPalHostedFields` hook
 function CreditCardForm({ product }: { product: any }) {
   const { cardFields } = usePayPalHostedFields();
   const [paying, setPaying] = useState(false);
 
   const submitHandler = () => {
-    if (typeof cardFields.submit !== "function") return;
+    // FIX IS HERE: We check if cardFields exists first
+    if (!cardFields) return;
+
     setPaying(true);
     
-    // This sends the card data securely to PayPal
     cardFields.submit()
       .then(() => {
-        // Success!
         alert(`Payment successful for ${product.name}!`);
         setPaying(false);
       })
       .catch((err) => {
-        // Error
         console.error(err);
         alert("Payment failed. Check console.");
         setPaying(false);
@@ -113,8 +108,6 @@ function CreditCardForm({ product }: { product: any }) {
 
   return (
     <div className="space-y-6">
-      
-      {/* Card Number */}
       <div>
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Card Number</label>
         <PayPalHostedField
@@ -126,7 +119,6 @@ function CreditCardForm({ product }: { product: any }) {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {/* Expiration Date */}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Expiration</label>
           <PayPalHostedField
@@ -137,7 +129,6 @@ function CreditCardForm({ product }: { product: any }) {
           />
         </div>
 
-        {/* CVV */}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">CVV</label>
           <PayPalHostedField

@@ -10,15 +10,20 @@ export async function POST() {
   try {
     // 1. Get Access Token
     const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
-    const response = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token", {
+    const response = await fetch("https://api.sandbox.paypal.com/v1/oauth2/token", {
       method: "POST",
       body: "grant_type=client_credentials",
       headers: { Authorization: `Basic ${auth}` },
     });
     const data = await response.json();
 
+    if (!data.access_token) {
+      console.error("PayPal Auth Failed:", data);
+      return NextResponse.json({ error: "Auth failed" }, { status: 500 });
+    }
+
     // 2. Get Client Token
-    const response2 = await fetch("https://api-m.sandbox.paypal.com/v1/identity/generate-token", {
+    const response2 = await fetch("https://api.sandbox.paypal.com/v1/identity/generate-token", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${data.access_token}`,

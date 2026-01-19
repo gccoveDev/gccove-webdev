@@ -76,32 +76,11 @@ export default function StartProject() {
               options={{
                 clientId: paypalState.clientId,
                 dataClientToken: paypalState.clientToken,
-                // components: "hosted-fields,buttons", // <--- COMMENTED OUT TO DEBUG
-                // currency: "USD",
-                // intent: "CAPTURE"
+                components: "hosted-fields,buttons",
+                currency: "USD",
+                intent: "CAPTURE"
               }}
             >
-              {/* DEBUGGING: Try standard buttons first to verify Client ID */}
-              <div className="text-center mb-4 text-yellow-500">
-                Debug Mode: Testing Standard Buttons
-              </div>
-              <PayPalButtons
-                style={{ layout: "vertical" }}
-                createOrder={(data, actions) => {
-                  return actions.order.create({
-                    intent: "CAPTURE",
-                    purchase_units: [{
-                      description: selectedProduct.name,
-                      amount: {
-                        currency_code: "USD",
-                        value: selectedProduct.price,
-                      },
-                    }],
-                  });
-                }}
-              />
-
-              {/* 
               <PayPalHostedFieldsProvider
                 createOrder={((data: any, actions: any) => {
                   return actions.order.create({
@@ -120,16 +99,15 @@ export default function StartProject() {
                     "font-size": "16px",
                     "font-family": "sans-serif",
                     "color": "#ffffff",
-                    "padding": "0 16px", 
+                    "padding": "0 16px",
                   },
                   "::placeholder": {
-                    "color": "#6b7280", 
+                    "color": "#6b7280",
                   },
                 }}
               >
                 <CreditCardForm product={selectedProduct} />
               </PayPalHostedFieldsProvider>
-              */}
             </PayPalScriptProvider>
           ) : (
             // LOADING STATE (Prevents the build error!)

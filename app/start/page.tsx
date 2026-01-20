@@ -2,10 +2,7 @@
 
 import {
   PayPalScriptProvider,
-  PayPalHostedFieldsProvider,
-  PayPalHostedField,
-  usePayPalHostedFields,
-  PayPalButtons
+  PayPalButtons,
 } from "@paypal/react-paypal-js";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -39,7 +36,6 @@ export default function StartProject() {
     })();
   }, []);
 
-
   return (
     <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
       <h1 className="text-4xl md:text-6xl font-black mb-12 text-center">
@@ -47,7 +43,7 @@ export default function StartProject() {
       </h1>
 
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Left Side: Product Selection (Same as before) */}
+        {/* Left Side: Product Selection */}
         <div className="space-y-4">
           <h3 className="text-xl font-bold mb-4">1. Select Service</h3>
           {products.map((item) => (
@@ -76,38 +72,38 @@ export default function StartProject() {
               options={{
                 clientId: paypalState.clientId,
                 dataClientToken: paypalState.clientToken,
-                components: "hosted-fields,buttons",
+                components: "buttons",
                 currency: "USD",
                 intent: "CAPTURE"
               }}
             >
-              <PayPalHostedFieldsProvider
-                createOrder={((data: any, actions: any) => {
-                  return actions.order.create({
-                    intent: "CAPTURE",
-                    purchase_units: [{
-                      description: selectedProduct.name,
-                      amount: {
-                        currency_code: "USD",
-                        value: selectedProduct.price,
-                      },
-                    }],
-                  });
-                }) as any}
-                styles={{
-                  input: {
-                    "font-size": "16px",
-                    "font-family": "sans-serif",
-                    "color": "#ffffff",
-                    "padding": "0 16px",
-                  },
-                  "::placeholder": {
-                    "color": "#6b7280",
-                  },
-                }}
-              >
-                <CreditCardForm product={selectedProduct} />
-              </PayPalHostedFieldsProvider>
+              <div className="space-y-4">
+                <PayPalButtons
+                  style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
+                  createOrder={(data, actions: any) => {
+                    return actions.order?.create({
+                      intent: "CAPTURE",
+                      purchase_units: [{
+                        description: selectedProduct.name,
+                        amount: {
+                          currency_code: "USD",
+                          value: selectedProduct.price,
+                        },
+                      }],
+                    });
+                  }}
+                  onApprove={(data, actions: any) => {
+                    return actions.order?.capture().then((details: any) => {
+                      const name = details?.payer?.name?.given_name;
+                      alert(`Transaction completed by ${name}`);
+                    });
+                  }}
+                  onError={(err) => {
+                    console.error("PayPal Error:", err);
+                    alert("Payment failed");
+                  }}
+                />
+              </div>
             </PayPalScriptProvider>
           ) : (
             // LOADING STATE (Prevents the build error!)
@@ -127,71 +123,3 @@ export default function StartProject() {
   );
 }
 
-function CreditCardForm({ product }: { product: any }) {
-  const { cardFields } = usePayPalHostedFields();
-  const [paying, setPaying] = useState(false);
-
-  const submitHandler = () => {
-    if (!cardFields) return;
-    setPaying(true);
-
-    cardFields.submit()
-      .then(() => {
-        alert(`Payment successful for ${product.name}!`);
-        setPaying(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Payment failed. Check console.");
-        setPaying(false);
-      });
-  };
-
-  return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div>
-        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Card Number</label>
-        <PayPalHostedField
-          id="card-number"
-          hostedFieldType="number"
-          options={{ selector: "#card-number", placeholder: "0000 0000 0000 0000" }}
-          className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Expiration</label>
-          <PayPalHostedField
-            id="expiration-date"
-            hostedFieldType="expirationDate"
-            options={{ selector: "#expiration-date", placeholder: "MM/YY" }}
-            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">CVV</label>
-          <PayPalHostedField
-            id="cvv"
-            hostedFieldType="cvv"
-            options={{ selector: "#cvv", placeholder: "123" }}
-            className="h-12 w-full bg-black border border-gray-700 rounded text-white focus:border-purple-500 transition-colors"
-          />
-        </div>
-      </div>
-
-      <button
-        onClick={submitHandler}
-        disabled={paying}
-        className="w-full bg-white text-black font-bold py-4 rounded hover:bg-gray-200 transition-colors disabled:opacity-50"
-      >
-        {paying ? "PROCESSING..." : `PAY $${product.price}`}
-      </button>
-
-      <p className="text-xs text-center text-gray-500 mt-4">
-        Payments processed securely by PayPal. No card data is stored on our servers.
-      </p>
-    </div>
-  );
-}

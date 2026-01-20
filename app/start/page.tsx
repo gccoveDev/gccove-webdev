@@ -67,7 +67,9 @@ export default function StartProject() {
 
           <div className="bg-black p-6 rounded-lg border border-gray-800 flex flex-col items-center justify-center min-h-[200px]">
             {scriptLoaded ? (
-              <PayPalHostedButton buttonId={selectedProduct.buttonId} />
+              <div className="w-full max-w-sm">
+                <PayPalHostedButton buttonId={selectedProduct.buttonId} />
+              </div>
             ) : (
               <div className="text-gray-500 animate-pulse">Loading securely...</div>
             )}

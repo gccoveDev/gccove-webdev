@@ -5,9 +5,10 @@ import Link from "next/link";
 
 const products = [
   { id: 1, name: "1-hour infrastructure call", price: "300.00", buttonId: "RAYDS3KHX2EW4" },
-  { id: 2, name: "30-minute existing site edit", price: "39.00", buttonId: "RAYDS3KHX2EW4" }, // Placeholder
-  { id: 3, name: "30-minute existing site edit (Extended)", price: "50.00", buttonId: "RAYDS3KHX2EW4" }, // Placeholder
-  { id: 4, name: "Basic site demo", price: "100.00", buttonId: "RAYDS3KHX2EW4" }, // Placeholder
+  { id: 2, name: "30-minute existing site edit", price: "39.00", buttonId: "VLUX8JERRKK5Q" },
+  { id: 3, name: "30-minute existing site edit (Extended)", price: "50.00", buttonId: "KRV3GMP4DJQME" },
+  { id: 4, name: "Basic site demo", price: "100.00", buttonId: "NS3GQ5EGLXYFW" },
+  { id: 5, name: "Full Stack site demo", price: "200.00", buttonId: "WCTF3WV5DQQK4" },
 ];
 
 // Helper to load the PayPal script manually since we need specific query params

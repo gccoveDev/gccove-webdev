@@ -1,40 +1,38 @@
 "use client";
 
-import {
-  PayPalScriptProvider,
-  PayPalButtons,
-} from "@paypal/react-paypal-js";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 const products = [
-  { id: 1, name: "1-hour infrastructure call", price: "300.00" },
-  { id: 2, name: "30-minute existing site edit", price: "39.00" },
-  { id: 3, name: "30-minute existing site edit (Extended)", price: "50.00" },
-  { id: 4, name: "Basic site demo", price: "100.00" },
+  { id: 1, name: "1-hour infrastructure call", price: "300.00", buttonId: "RAYDS3KHX2EW4" },
+  { id: 2, name: "30-minute existing site edit", price: "39.00", buttonId: "RAYDS3KHX2EW4" }, // Placeholder
+  { id: 3, name: "30-minute existing site edit (Extended)", price: "50.00", buttonId: "RAYDS3KHX2EW4" }, // Placeholder
+  { id: 4, name: "Basic site demo", price: "100.00", buttonId: "RAYDS3KHX2EW4" }, // Placeholder
 ];
 
-export default function StartProject() {
-  const [selectedProduct, setSelectedProduct] = useState(products[3]);
-  const [paypalState, setPaypalState] = useState({ clientToken: null, clientId: null });
+// Helper to load the PayPal script manually since we need specific query params
+const usePayPalScript = (clientId: string) => {
+  const [loaded, setLoaded] = useState(false);
 
-  // FETCH TOKEN AND ID TOGETHER
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/paypal", { method: "POST" });
-        const data = await res.json();
-        console.log("PayPal Data Loaded:", data);
-        // Save both to state
-        setPaypalState({
-          clientToken: data.client_token,
-          clientId: data.client_id
-        });
-      } catch (err) {
-        console.error("Failed to load PayPal", err);
-      }
-    })();
-  }, []);
+    if (document.getElementById("paypal-sdk")) {
+      setLoaded(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&enable-funding=venmo&currency=USD`;
+    script.id = "paypal-sdk";
+    script.onload = () => setLoaded(true);
+    document.body.appendChild(script);
+  }, [clientId]);
+
+  return loaded;
+};
+
+export default function StartProject() {
+  const [selectedProduct, setSelectedProduct] = useState(products[0]);
+  const scriptLoaded = usePayPalScript("BAAh3avgfllx9oLmqObkvScdhvg9OSHpgMnxzVMxBb-WsywKqhsb4DShxfPOwM5ZGoWknSbdgMS9FT12Sk");
 
   return (
     <main className="min-h-screen bg-black text-white p-8 md:p-24 font-sans">
@@ -63,54 +61,21 @@ export default function StartProject() {
           ))}
         </div>
 
-        {/* Right Side: The Custom Form */}
-        <div className="bg-neutral-900 p-8 rounded-xl border border-gray-800 min-h-[400px]">
+        {/* Right Side: The Hosted Button */}
+        <div className="bg-neutral-900 p-8 rounded-xl border border-gray-800 min-h-[400px] flex flex-col justify-center">
           <h3 className="text-xl font-bold mb-6">2. Payment Details</h3>
-          {/* ONLY RENDER IF WE HAVE BOTH TOKEN AND ID */}
-          {paypalState.clientToken && paypalState.clientId ? (
-            <PayPalScriptProvider
-              options={{
-                clientId: paypalState.clientId,
-                dataClientToken: paypalState.clientToken,
-                components: "buttons",
-                currency: "USD",
-                intent: "CAPTURE"
-              }}
-            >
-              <div className="space-y-4">
-                <PayPalButtons
-                  style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
-                  createOrder={(data, actions: any) => {
-                    return actions.order?.create({
-                      intent: "CAPTURE",
-                      purchase_units: [{
-                        description: selectedProduct.name,
-                        amount: {
-                          currency_code: "USD",
-                          value: selectedProduct.price,
-                        },
-                      }],
-                    });
-                  }}
-                  onApprove={(data, actions: any) => {
-                    return actions.order?.capture().then((details: any) => {
-                      const name = details?.payer?.name?.given_name;
-                      alert(`Transaction completed by ${name}`);
-                    });
-                  }}
-                  onError={(err) => {
-                    console.error("PayPal Error:", err);
-                    alert("Payment failed");
-                  }}
-                />
-              </div>
-            </PayPalScriptProvider>
-          ) : (
-            // LOADING STATE (Prevents the build error!)
-            <div className="flex items-center justify-center h-64 text-gray-500 animate-pulse">
-              Loading Secure Checkout...
-            </div>
-          )}
+
+          <div className="bg-black p-6 rounded-lg border border-gray-800 flex flex-col items-center justify-center min-h-[200px]">
+            {scriptLoaded ? (
+              <PayPalHostedButton buttonId={selectedProduct.buttonId} />
+            ) : (
+              <div className="text-gray-500 animate-pulse">Loading securely...</div>
+            )}
+          </div>
+
+          <p className="text-xs text-center text-gray-500 mt-6">
+            You will be redirected to PayPal to complete your secure transaction.
+          </p>
         </div>
       </div>
 
@@ -121,5 +86,28 @@ export default function StartProject() {
       </div>
     </main>
   );
+}
+
+function PayPalHostedButton({ buttonId }: { buttonId: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current || !(window as any).paypal) return;
+
+    // Clear previous button if ID changed
+    containerRef.current.innerHTML = "";
+
+    // Render new button
+    try {
+      (window as any).paypal.HostedButtons({
+        hostedButtonId: buttonId,
+      }).render(containerRef.current);
+    } catch (e) {
+      console.error("PayPal Render Error:", e);
+    }
+
+  }, [buttonId]);
+
+  return <div ref={containerRef} className="z-10 relative" />;
 }
 

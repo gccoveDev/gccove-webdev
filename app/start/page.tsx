@@ -9,6 +9,7 @@ const products = [
   { id: 3, name: "30-minute existing site edit (Extended)", price: "50.00", buttonId: "KRV3GMP4DJQME" },
   { id: 4, name: "Basic site demo", price: "100.00", buttonId: "NS3GQ5EGLXYFW" },
   { id: 5, name: "Full Stack site demo", price: "200.00", buttonId: "WCTF3WV5DQQK4" },
+  { id: 6, name: "Engineering Services(general)", price: "price set with Ollie", buttonId: "VRUAYJMS7WMSG" },
 ];
 
 // Helper to load the PayPal script manually since we need specific query params
